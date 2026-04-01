@@ -3,8 +3,11 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>외눈이 클립보드</title>
+  <title>외눈이 클립보드 (정렬 가능)</title>
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+  
+  <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
+
   <style>
     :root {
       --bg: #0e0e12;
@@ -52,23 +55,30 @@
       gap: 12px;
     }
 
+    /* 드래그 중인 카드 스타일 */
+    .sortable-ghost {
+      opacity: 0.4;
+      border: 2px dashed var(--accent);
+    }
+
     .card {
       background: var(--surface);
       border: 1px solid var(--border);
       border-radius: 14px;
-      cursor: pointer;
+      cursor: grab; /* 드래그 가능 아이콘 */
       transition: transform 0.15s, border-color 0.15s;
       padding: 16px 20px;
       display: flex;
       align-items: center;
       justify-content: space-between;
       gap: 16px;
+      user-select: none;
     }
 
+    .card:active { cursor: grabbing; }
     .card:hover { transform: translateY(-2px); border-color: var(--accent); }
-    .card:active { transform: translateY(0); }
 
-    .card-title { font-size: 14px; font-weight: 500; }
+    .card-title { font-size: 14px; font-weight: 500; pointer-events: none; }
 
     .copy-btn {
       font-family: 'DM Mono', monospace;
@@ -76,6 +86,8 @@
       color: var(--muted);
       flex-shrink: 0;
       transition: color 0.15s;
+      padding: 5px;
+      cursor: pointer;
     }
 
     .card.copied { border-color: rgba(76,219,138,0.4); }
@@ -106,87 +118,76 @@
 
   <header>
     <h1>👁 외눈이 클립보드</h1>
-    <p>클릭하면 바로 복사돼요</p>
+    <p>길게 눌러 드래그해서 순서를 바꾸고, 클릭해서 복사하세요</p>
   </header>
 
   <div class="grid" id="grid"></div>
   <div class="toast" id="toast">✓ 복사 완료!</div>
 
   <script>
-    // ✏️ 여기만 수정하세요 — title 과 text 두 가지만 채우면 됩니다
     const messages = [
-      {
-        title: "파리 교통권 추천 서비스",
-        text: `📩 파리 교통권 추천 서비스 안내
-
-안녕하세요, 외눈이입니다! ✨
-파리 여행의 필수 준비물, 제가 직접 개발한 
-'무료 파리 최적 교통권 추천' 서비스 링크를 보내드려요! 🚇
-
-[외눈이의 파리 교통권 추천 서비스.] 
-https://paris-transport-2026.vercel.app/
-
-매번 계산하기 복잡하고 헷갈리는 파리 교통권, 이제 고민하지 마세요. 😎 
-여행 날짜와 이동 횟수만 넣으면 가장 가성비 좋은 하이브리드 전략을 바로 확인하실 수 있습니다! 
-
-⚠️ 이용 시 주의사항
-* 무료 앱이라, 트래픽이 초과되었을 때는 접속이 안될 수 있어요. 다음 날 이용해주세요.
-* 사용 시 오류가 있다면 DM 으로 보고해주시면 즉시 수정/반영 됩니다 
-
-정보가 도움 되셨다면 제 게시글에 좋아요 많이 눌러주세요 감사합니다 😉`
-      },
-      {
-        title: "38Riv 재즈클럽 예약 안내",
-        text: `📩 38Riv 재즈클럽 예약 안내 DM
-38Riv 재즈클럽 예약 방법 공유해 드려요. 🎫
-
-🎹 예약 방법
-1. 공식 예약 사이트 접속: https://38riv.com/en/concerts
-2. 관람을 원하는 콘서트 또는 잼 세션 선택
-3. 인원수 선택 후 결제하면 예약 완료!
-
-⚠️ 이용 꿀팁 & 주의사항
-* 밤 11시 잼 세션: 사전 예매 시 개장 후 최대 30분까지 우선 입장이 보장됩니다.
-   * 오후 11시 - 우선 입장 / 줄 서지 않고 입장 가능
-   * 오후 11시 30분 - 우선 입장 종료 (인원이 많을 경우 대기 시간이 발생할 수 있으며, 티켓은 환불되지 않습니다.)
-* 환불 정책: 티켓은 환불이 불가하니 일정을 꼭 확인하고 신중하게 예매하시는 걸 추천드려요! 😢 (제 친구도 아파서 못 왔는데 아쉽게 환불을 못 받았답니다..)`
-      },
-      // ✏️ 새 항목 추가: 아래 블록을 복붙 후 title/text만 바꾸세요
-      // {
-      //   title: "제목",
-      //   text: `내용`
-      // },
+      { title: "파리 교통권 추천 서비스", text: `📩 파리 교통권 추천 서비스 안내...` },
+      { title: "38Riv 재즈클럽 예약 안내", text: `📩 38Riv 재즈클럽 예약 안내 DM...` },
+      { title: "빅 마마 그룹 맛집 지도 (이탈리안)", text: `[빅 마마 그룹 맛집 지도 🍕🇫🇷]...` },
+      { title: "2026 파리 바게트 TOP 10 지도", text: `📩 2026 파리 바게트 TOP 10 지도...` },
+      { title: "오 코셰 예약 및 한국어 메뉴", text: `📩 오 코셰 예약 및 한국어 메뉴 안내 DM...` },
+      { title: "네르하 여행 가이드 (스페인)", text: `[네르하 여행 안내 가이드 🌊]...` },
+      { title: "에어프랑스 비즈니스 업그레이드 팁", text: `✈️ 🇫🇷 에어프랑스 비즈니스 탑승 상세 후기...` },
+      { title: "바토무슈 유람선 티켓 & 쿠폰", text: `🇫🇷 파리 바토무슈 유람선 티켓 링크...` },
+      { title: "뤼나르 샴페인 하우스 예약", text: `📩 뤼나르 예약 링크 안내 DM...` },
+      { title: "파리 내추럴 와인바 8곳 지도", text: `📩 파리 와인바 리스트 공유 DM...` },
+      { title: "부용 샤르티에 가성비 식당 정보", text: `🇫🇷 파리 가성비 식당, 부용 샤르티에...` },
+      { title: "PSG 축구 직관 예매 안내", text: `⚽️🇫🇷 파리 생제르망(PSG) 축구 직관...` },
+      { title: "베르동 협곡 보트 대여 안내", text: `🇫🇷 남프랑스 베르동 협곡 보트...` },
+      { title: "향수 만들기 클래스 & 할인코드", text: `📩 향수 만들기 클래스 예약...` }
     ];
 
     const grid = document.getElementById('grid');
     const toast = document.getElementById('toast');
     let toastTimer;
 
-    messages.forEach(msg => {
-      const card = document.createElement('div');
-      card.className = 'card';
-      card.innerHTML = `
-        <span class="card-title">${msg.title}</span>
-        <span class="copy-btn">COPY</span>
-      `;
-      card.addEventListener('click', () => {
-        navigator.clipboard.writeText(msg.text).then(() => {
-          document.querySelectorAll('.card').forEach(c => {
-            c.classList.remove('copied');
-            c.querySelector('.copy-btn').textContent = 'COPY';
+    // 카드 생성 함수
+    function createCards() {
+      messages.forEach(msg => {
+        const card = document.createElement('div');
+        card.className = 'card';
+        card.dataset.text = msg.text; // 텍스트 데이터를 속성에 저장
+        card.innerHTML = `
+          <span class="card-title">${msg.title}</span>
+          <span class="copy-btn">COPY</span>
+        `;
+        
+        card.addEventListener('click', () => {
+          const textToCopy = card.dataset.text;
+          navigator.clipboard.writeText(textToCopy).then(() => {
+            document.querySelectorAll('.card').forEach(c => {
+              c.classList.remove('copied');
+              c.querySelector('.copy-btn').textContent = 'COPY';
+            });
+            card.classList.add('copied');
+            card.querySelector('.copy-btn').textContent = '✓';
+            clearTimeout(toastTimer);
+            toast.classList.add('show');
+            toastTimer = setTimeout(() => toast.classList.remove('show'), 2000);
+            setTimeout(() => {
+              card.classList.remove('copied');
+              card.querySelector('.copy-btn').textContent = 'COPY';
+            }, 3000);
           });
-          card.classList.add('copied');
-          card.querySelector('.copy-btn').textContent = '✓';
-          clearTimeout(toastTimer);
-          toast.classList.add('show');
-          toastTimer = setTimeout(() => toast.classList.remove('show'), 2000);
-          setTimeout(() => {
-            card.classList.remove('copied');
-            card.querySelector('.copy-btn').textContent = 'COPY';
-          }, 3000);
         });
+        grid.appendChild(card);
       });
-      grid.appendChild(card);
+    }
+
+    createCards();
+
+    // 2. 드래그 앤 드랍 활성화
+    new Sortable(grid, {
+      animation: 150,
+      ghostClass: 'sortable-ghost',
+      onEnd: function() {
+        console.log("순서 변경 완료");
+      }
     });
   </script>
 </body>
