@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>외눈이 클립보드</title>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+  <style>
+    :root {
+      --bg: #0e0e12;
+      --surface: #16161d;
+      --surface2: #1e1e28;
+      --border: #2a2a38;
+      --accent: #7c6cfc;
+      --accent2: #f0a04b;
+      --text: #e8e8f0;
+      --muted: #7070a0;
+      --success: #4cdb8a;
+      --card-radius: 16px;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Noto Sans KR', sans-serif;
+      min-height: 100vh;
+      padding: 40px 20px 80px;
+      background-image:
+        radial-gradient(ellipse 60% 40% at 80% 10%, rgba(124,108,252,0.08) 0%, transparent 60%),
+        radial-gradient(ellipse 40% 30% at 10% 90%, rgba(240,160,75,0.06) 0%, transparent 50%);
+    }
+
+    header {
+      max-width: 680px;
+      margin: 0 auto 48px;
+      text-align: center;
+    }
+
+    .logo {
+      font-family: 'DM Mono', monospace;
+      font-size: 11px;
+      letter-spacing: 0.25em;
+      color: var(--muted);
+      text-transform: uppercase;
+      margin-bottom: 14px;
+    }
+
+    header h1 {
+      font-size: 28px;
+      font-weight: 700;
+      letter-spacing: -0.5px;
+      background: linear-gradient(135deg, #fff 30%, var(--accent) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    header p {
+      margin-top: 10px;
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 300;
+    }
+
+    .grid {
+      max-width: 680px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--card-radius);
+      overflow: hidden;
+      cursor: pointer;
+      transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
+      position: relative;
+    }
+
+    .card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 12px 40px rgba(0,0,0,0.4), 0 0 0 1px var(--accent);
+      border-color: var(--accent);
+    }
+
+    .card:active {
+      transform: translateY(0px);
+    }
+
+    .card-header {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 20px 24px 16px;
+    }
+
+    .card-icon {
+      width: 42px;
+      height: 42px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      flex-shrink: 0;
+    }
+
+    .card:nth-child(1) .card-icon { background: rgba(124,108,252,0.15); }
+    .card:nth-child(2) .card-icon { background: rgba(240,160,75,0.15); }
+
+    .card-title {
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--text);
+      line-height: 1.3;
+    }
+
+    .card-subtitle {
+      font-size: 12px;
+      color: var(--muted);
+      margin-top: 3px;
+      font-weight: 300;
+    }
+
+    .card-preview {
+      padding: 0 24px 16px;
+      font-size: 12.5px;
+      color: var(--muted);
+      line-height: 1.7;
+      font-weight: 300;
+      white-space: pre-wrap;
+      overflow: hidden;
+      max-height: 72px;
+      mask-image: linear-gradient(to bottom, black 60%, transparent 100%);
+      -webkit-mask-image: linear-gradient(to bottom, black 60%, transparent 100%);
+    }
+
+    .card-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 24px;
+      border-top: 1px solid var(--border);
+      background: var(--surface2);
+    }
+
+    .copy-hint {
+      font-family: 'DM Mono', monospace;
+      font-size: 11px;
+      color: var(--muted);
+      letter-spacing: 0.05em;
+    }
+
+    .copy-btn {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--accent);
+      font-family: 'DM Mono', monospace;
+      letter-spacing: 0.03em;
+      transition: color 0.15s;
+    }
+
+    .copy-icon {
+      width: 14px;
+      height: 14px;
+      opacity: 0.7;
+    }
+
+    /* Copied state */
+    .card.copied .card-footer {
+      background: rgba(76, 219, 138, 0.06);
+      border-top-color: rgba(76, 219, 138, 0.2);
+    }
+
+    .card.copied .copy-btn {
+      color: var(--success);
+    }
+
+    .card.copied .copy-hint {
+      color: var(--success);
+      opacity: 0.6;
+    }
+
+    .card.copied {
+      border-color: rgba(76, 219, 138, 0.35);
+      box-shadow: 0 0 0 1px rgba(76, 219, 138, 0.35), 0 8px 30px rgba(76,219,138,0.08);
+    }
+
+    /* Toast */
+    .toast {
+      position: fixed;
+      bottom: 32px;
+      left: 50%;
+      transform: translateX(-50%) translateY(20px);
+      background: var(--success);
+      color: #0a2016;
+      font-size: 13px;
+      font-weight: 700;
+      padding: 10px 22px;
+      border-radius: 100px;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.25s, transform 0.25s;
+      z-index: 999;
+      white-space: nowrap;
+    }
+
+    .toast.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    .divider {
+      height: 1px;
+      background: var(--border);
+      margin: 8px 24px;
+      opacity: 0.5;
+    }
+
+    footer {
+      max-width: 680px;
+      margin: 48px auto 0;
+      text-align: center;
+      font-size: 11px;
+      color: var(--muted);
+      font-family: 'DM Mono', monospace;
+      letter-spacing: 0.05em;
+      opacity: 0.5;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="logo">👁 외눈이 블로그</div>
+    <h1>DM 클립보드</h1>
+    <p>카드를 클릭하면 전체 내용이 클립보드에 복사됩니다</p>
+  </header>
+
+  <div class="grid" id="grid"></div>
+
+  <div class="toast" id="toast">✓ 복사 완료!</div>
+
+  <footer>tap to copy · click again to recopy</footer>
+
+  <script>
+    const messages = [
+      {
+        icon: "🚇",
+        title: "파리 교통권 추천 서비스",
+        subtitle: "파리 최적 교통권 추천 링크 DM",
+        text: `📩 파리 교통권 추천 서비스 안내
+
+안녕하세요, 외눈이입니다! ✨
+파리 여행의 필수 준비물, 제가 직접 개발한 
+'무료 파리 최적 교통권 추천' 서비스 링크를 보내드려요! 🚇
+
+[외눈이의 파리 교통권 추천 서비스.] 
+https://paris-transport-2026.vercel.app/
+
+매번 계산하기 복잡하고 헷갈리는 파리 교통권, 이제 고민하지 마세요. 😎 
+여행 날짜와 이동 횟수만 넣으면 가장 가성비 좋은 하이브리드 전략을 바로 확인하실 수 있습니다! 
+
+⚠️ 이용 시 주의사항
+* 무료 앱이라, 트래픽이 초과되었을 때는 접속이 안될 수 있어요. 다음 날 이용해주세요.
+* 사용 시 오류가 있다면 DM 으로 보고해주시면 즉시 수정/반영 됩니다 
+
+정보가 도움 되셨다면 제 게시글에 좋아요 많이 눌러주세요 감사합니다 😉`
+      },
+      {
+        icon: "🎹",
+        title: "38Riv 재즈클럽 예약 안내",
+        subtitle: "재즈클럽 예약 방법 DM",
+        text: `📩 38Riv 재즈클럽 예약 안내 DM
+38Riv 재즈클럽 예약 방법 공유해 드려요. 🎫
+
+🎹 예약 방법
+1. 공식 예약 사이트 접속: https://38riv.com/en/concerts
+2. 관람을 원하는 콘서트 또는 잼 세션 선택
+3. 인원수 선택 후 결제하면 예약 완료!
+
+⚠️ 이용 꿀팁 & 주의사항
+* 밤 11시 잼 세션: 사전 예매 시 개장 후 최대 30분까지 우선 입장이 보장됩니다.
+   * 오후 11시 - 우선 입장 / 줄 서지 않고 입장 가능
+   * 오후 11시 30분 - 우선 입장 종료 (인원이 많을 경우 대기 시간이 발생할 수 있으며, 티켓은 환불되지 않습니다.)
+* 환불 정책: 티켓은 환불이 불가하니 일정을 꼭 확인하고 신중하게 예매하시는 걸 추천드려요! 😢 (제 친구도 아파서 못 왔는데 아쉽게 환불을 못 받았답니다..)`
+      }
+    ];
+
+    const grid = document.getElementById('grid');
+    const toast = document.getElementById('toast');
+    let toastTimer;
+
+    messages.forEach((msg, i) => {
+      const card = document.createElement('div');
+      card.className = 'card';
+      card.innerHTML = `
+        <div class="card-header">
+          <div class="card-icon">${msg.icon}</div>
+          <div>
+            <div class="card-title">${msg.title}</div>
+            <div class="card-subtitle">${msg.subtitle}</div>
+          </div>
+        </div>
+        <div class="card-preview">${msg.text}</div>
+        <div class="card-footer">
+          <span class="copy-hint">클릭하여 복사</span>
+          <span class="copy-btn">
+            <svg class="copy-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
+              <rect x="5" y="5" width="9" height="9" rx="1.5"/>
+              <path d="M11 5V3.5A1.5 1.5 0 0 0 9.5 2h-7A1.5 1.5 0 0 0 1 3.5v7A1.5 1.5 0 0 0 2.5 12H4"/>
+            </svg>
+            COPY
+          </span>
+        </div>
+      `;
+
+      card.addEventListener('click', () => {
+        navigator.clipboard.writeText(msg.text).then(() => {
+          // Reset all cards
+          document.querySelectorAll('.card').forEach(c => {
+            c.classList.remove('copied');
+            c.querySelector('.copy-hint').textContent = '클릭하여 복사';
+            c.querySelector('.copy-btn').innerHTML = `
+              <svg class="copy-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
+                <rect x="5" y="5" width="9" height="9" rx="1.5"/>
+                <path d="M11 5V3.5A1.5 1.5 0 0 0 9.5 2h-7A1.5 1.5 0 0 0 1 3.5v7A1.5 1.5 0 0 0 2.5 12H4"/>
+              </svg>
+              COPY`;
+          });
+
+          // Activate this card
+          card.classList.add('copied');
+          card.querySelector('.copy-hint').textContent = '복사됨 ✓';
+          card.querySelector('.copy-btn').innerHTML = `✓ COPIED`;
+
+          // Show toast
+          clearTimeout(toastTimer);
+          toast.classList.add('show');
+          toastTimer = setTimeout(() => toast.classList.remove('show'), 2000);
+
+          // Reset after 3s
+          setTimeout(() => {
+            card.classList.remove('copied');
+            card.querySelector('.copy-hint').textContent = '클릭하여 복사';
+            card.querySelector('.copy-btn').innerHTML = `
+              <svg class="copy-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
+                <rect x="5" y="5" width="9" height="9" rx="1.5"/>
+                <path d="M11 5V3.5A1.5 1.5 0 0 0 9.5 2h-7A1.5 1.5 0 0 0 1 3.5v7A1.5 1.5 0 0 0 2.5 12H4"/>
+              </svg>
+              COPY`;
+          }, 3000);
+        });
+      });
+
+      grid.appendChild(card);
+    });
+  </script>
+</body>
+</html>
