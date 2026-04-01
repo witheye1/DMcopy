@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>외눈이 클립보드 (정렬 가능)</title>
+  <title>외눈이 클립보드 (최종본)</title>
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet"/>
   
   <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
@@ -43,6 +43,7 @@
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
       background-clip: text;
+      letter-spacing: -0.5px;
     }
 
     header p { margin-top: 8px; color: var(--muted); font-size: 12px; }
@@ -55,9 +56,9 @@
       gap: 12px;
     }
 
-    /* 드래그 중인 카드 스타일 */
+    /* 드래그 애니메이션 스타일 */
     .sortable-ghost {
-      opacity: 0.4;
+      opacity: 0.3;
       border: 2px dashed var(--accent);
     }
 
@@ -65,7 +66,7 @@
       background: var(--surface);
       border: 1px solid var(--border);
       border-radius: 14px;
-      cursor: grab; /* 드래그 가능 아이콘 */
+      cursor: grab;
       transition: transform 0.15s, border-color 0.15s;
       padding: 16px 20px;
       display: flex;
@@ -85,9 +86,7 @@
       font-size: 11px;
       color: var(--muted);
       flex-shrink: 0;
-      transition: color 0.15s;
-      padding: 5px;
-      cursor: pointer;
+      pointer-events: none; /* 카드 전체 클릭으로 복사하기 위함 */
     }
 
     .card.copied { border-color: rgba(76,219,138,0.4); }
@@ -117,8 +116,8 @@
 <body>
 
   <header>
-    <h1>👁 외눈이 클립보드</h1>
-    <p>길게 눌러 드래그해서 순서를 바꾸고, 클릭해서 복사하세요</p>
+    <h1>👁️ 외눈이 클립보드</h1>
+    <p>길게 눌러 순서 변경 | 클릭해서 내용 복사</p>
   </header>
 
   <div class="grid" id="grid"></div>
@@ -126,20 +125,66 @@
 
   <script>
     const messages = [
-      { title: "파리 교통권 추천 서비스", text: `📩 파리 교통권 추천 서비스 안내...` },
-      { title: "38Riv 재즈클럽 예약 안내", text: `📩 38Riv 재즈클럽 예약 안내 DM...` },
-      { title: "빅 마마 그룹 맛집 지도 (이탈리안)", text: `[빅 마마 그룹 맛집 지도 🍕🇫🇷]...` },
-      { title: "2026 파리 바게트 TOP 10 지도", text: `📩 2026 파리 바게트 TOP 10 지도...` },
-      { title: "오 코셰 예약 및 한국어 메뉴", text: `📩 오 코셰 예약 및 한국어 메뉴 안내 DM...` },
-      { title: "네르하 여행 가이드 (스페인)", text: `[네르하 여행 안내 가이드 🌊]...` },
-      { title: "에어프랑스 비즈니스 업그레이드 팁", text: `✈️ 🇫🇷 에어프랑스 비즈니스 탑승 상세 후기...` },
-      { title: "바토무슈 유람선 티켓 & 쿠폰", text: `🇫🇷 파리 바토무슈 유람선 티켓 링크...` },
-      { title: "뤼나르 샴페인 하우스 예약", text: `📩 뤼나르 예약 링크 안내 DM...` },
-      { title: "파리 내추럴 와인바 8곳 지도", text: `📩 파리 와인바 리스트 공유 DM...` },
-      { title: "부용 샤르티에 가성비 식당 정보", text: `🇫🇷 파리 가성비 식당, 부용 샤르티에...` },
-      { title: "PSG 축구 직관 예매 안내", text: `⚽️🇫🇷 파리 생제르망(PSG) 축구 직관...` },
-      { title: "베르동 협곡 보트 대여 안내", text: `🇫🇷 남프랑스 베르동 협곡 보트...` },
-      { title: "향수 만들기 클래스 & 할인코드", text: `📩 향수 만들기 클래스 예약...` }
+      {
+        title: "🚇 파리 교통권 추천",
+        text: `📩 파리 교통권 추천 서비스 안내\n\n안녕하세요, 외눈이입니다! ✨\n파리 여행의 필수 준비물, 제가 직접 개발한 '무료 파리 최적 교통권 추천' 서비스 링크를 보내드려요! 🚇\n\n[외눈이의 파리 교통권 추천 서비스.]\nhttps://paris-transport-2026.vercel.app/\n\n여행 날짜와 이동 횟수만 넣으면 가장 가성비 좋은 하이브리드 전략을 바로 확인하실 수 있습니다! 😎`
+      },
+      {
+        title: "🎹 38Riv 재즈클럽 예약",
+        text: `📩 38Riv 재즈클럽 예약 안내 DM\n\n🎹 예약 방법\n1. 공식 예약 사이트 접속: https://38riv.com/en/concerts\n2. 관람 원하는 세션 선택 후 결제\n\n⚠️ 밤 11시 잼 세션은 사전 예매 시 30분까지 우선 입장이 보장됩니다!`
+      },
+      {
+        title: "🍕 빅 마마 그룹 맛집 지도",
+        text: `[빅 마마 그룹 맛집 지도 🍕🇫🇷]\n파리에서 꼭 가봐야 할 빅마마그룹의 이탈리안 레스토랑 리스트입니다.\n\n💙 구글 맵 예약 링크\n👉 https://maps.app.goo.gl/wkPVdBa4vKKkekRW8`
+      },
+      {
+        title: "🥖 2026 파리 바게트 TOP 10",
+        text: `📩 2026 파리 바게트 TOP 10 지도\n\n🗺️ 구글맵 리스트: https://maps.app.goo.gl/GeLNi5UoycbRJwcS7\n\n주문할 때 "Une baguette tradition, s'il vous plaît"라고 말해보세요! 🫶`
+      },
+      {
+        title: "🥩 오 코셰(Ô'Cocher) 예약",
+        text: `📩 오 코셰 예약 및 한국어 메뉴 안내\n\n1️⃣ 간편 예약: https://zrr.kr/lwD1Ri\n2️⃣ 구글맵: https://maps.app.goo.gl/yoFynNV9iFfps1ox5\n3️⃣ 한국어 메뉴판: https://ococher.fr/ko/services`
+      },
+      {
+        title: "🌊 스페인 네르하 가이드",
+        text: `[네르하 여행 안내 가이드 🌊]\n🚌 ALSA 버스 예매: https://omio.sjv.io/rEamGj\n📍 주요 장소 모아보기 지도: https://maps.app.goo.gl/Q5aUpcJLJT8ebMuDA\n🏠 추천 숙소(빌라 플라멘카): https://3ha.in/r/404551`
+      },
+      {
+        title: "✈️ 에어프랑스 비즈니스 꿀팁",
+        text: `✈️ 에어프랑스 비즈니스 탑승 후기 & 팁\n\n‼️ 체크인 24시간 전 온라인 체크인 시 뜨는 '유료 업그레이드' 버튼을 공략하세요. 정가보다 훨씬 저렴하게 비즈니스 탑승이 가능합니다! 💎\n👉 후기: https://blog.naver.com/witheye1/224170582307`
+      },
+      {
+        title: "🛶 블로뉴 숲 보트 대여",
+        text: `📩 [블로뉴 숲] 호수 보트 대여 안내 🛶\n💰 요금: 30분 9€ / 1시간 14€\n💵 보증금: 50€ (현금 준비 필수!)\n📍 위치: https://maps.app.goo.gl/YK1wy4TXRBRpVbQT6`
+      },
+      {
+        title: "🚢 바토무슈 할인 예약",
+        text: `🇫🇷 파리 바토무슈 유람선 티켓\n🎟️ 최저가 구매 링크: https://3ha.in/r/354099\n🎁 2026 할인 쿠폰코드: PACKMP1000\n👉 상세 후기: https://blog.naver.com/witheye1/224172569990`
+      },
+      {
+        title: "🍾 뤼나르(Ruinart) 예약",
+        text: `📩 뤼나르 예약 링크 안내\n📍 공식 예약: https://www.ruinart.com/en-int/visitedescrayeresreims.html\n💡 팁: 투어 예약 실패 시에도 샴페인 샵과 바는 예약 없이 들를 수 있어요! 🥂`
+      },
+      {
+        title: "🍷 파리 내추럴 와인바 지도",
+        text: `📩 파리 와인바 리스트 공유\n'파리 힙스터들의 내추럴 와인바 8곳' 구글지도입니다.\n📍 지도 링크: https://maps.app.goo.gl/neDvwiz2dzuX46K19`
+      },
+      {
+        title: "🥐 2025 크로와상 맛집 리스트",
+        text: `🇫🇷 2025 파리 크로와상 수상 리스트\n👉 구글 지도: https://maps.app.goo.gl/d6NiC66GM99Ckb1r7\n👉 상세 후기: https://blog.naver.com/witheye1/224089533368`
+      },
+      {
+        title: "⚽ PSG 파리 직관 예매",
+        text: `⚽️ 파리 생제르망(PSG) 직관 예매\n1️⃣ 공식 홈페이지: https://billetterie.psg.fr/en/\n2️⃣ 한국어 예매(와그): https://3ha.in/r/349785\n✍️ 블로그 후기: https://blog.naver.com/witheye1/`
+      },
+      {
+        title: "⛰️ 베르동 협곡 보트 정보",
+        text: `🇫🇷 남프랑스 베르동 협곡 보트 여행\n📍 대여 장소: https://maps.app.goo.gl/QLEBSbazDyGW4GfE9\n⏰ 운영: 09:30~18:00\n🪪 여권 지참 필수! 사진 찍으려면 2시간 대여 추천합니다! 👍`
+      },
+      {
+        title: "👃 파리 향수 클래스 & 할인",
+        text: `📩 향수 만들기 클래스 예약 정보\n📍 클래스 예약: https://3ha.in/r/373410\n🎟️ 할인 쿠폰: PACKMP1000 / PACKMPT3000\n나만의 향수를 만들어보세요! 😉🧡`
+      }
     ];
 
     const grid = document.getElementById('grid');
@@ -147,46 +192,44 @@
     let toastTimer;
 
     // 카드 생성 함수
-    function createCards() {
-      messages.forEach(msg => {
+    function renderCards() {
+      messages.forEach((msg) => {
         const card = document.createElement('div');
         card.className = 'card';
-        card.dataset.text = msg.text; // 텍스트 데이터를 속성에 저장
+        card.dataset.text = msg.text; // 실제 복사될 텍스트 저장
+        
         card.innerHTML = `
           <span class="card-title">${msg.title}</span>
-          <span class="copy-btn">COPY</span>
+          <span class="copy-btn">DRAG & COPY</span>
         `;
         
+        // 클릭 시 복사 이벤트
         card.addEventListener('click', () => {
-          const textToCopy = card.dataset.text;
-          navigator.clipboard.writeText(textToCopy).then(() => {
-            document.querySelectorAll('.card').forEach(c => {
-              c.classList.remove('copied');
-              c.querySelector('.copy-btn').textContent = 'COPY';
-            });
+          const text = card.dataset.text;
+          navigator.clipboard.writeText(text).then(() => {
+            // 시각적 피드백
+            document.querySelectorAll('.card').forEach(c => c.classList.remove('copied'));
             card.classList.add('copied');
-            card.querySelector('.copy-btn').textContent = '✓';
+            
+            // 토스트 알림
             clearTimeout(toastTimer);
             toast.classList.add('show');
             toastTimer = setTimeout(() => toast.classList.remove('show'), 2000);
-            setTimeout(() => {
-              card.classList.remove('copied');
-              card.querySelector('.copy-btn').textContent = 'COPY';
-            }, 3000);
           });
         });
+        
         grid.appendChild(card);
       });
     }
 
-    createCards();
+    renderCards();
 
-    // 2. 드래그 앤 드랍 활성화
+    // 드래그 앤 드롭 기능 초기화
     new Sortable(grid, {
       animation: 150,
       ghostClass: 'sortable-ghost',
-      onEnd: function() {
-        console.log("순서 변경 완료");
+      onEnd: function (evt) {
+        console.log('순서가 변경되었습니다.');
       }
     });
   </script>
