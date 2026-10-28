@@ -129,7 +129,7 @@
     const REPO = { owner: 'witheye1', repo: 'DMcopy', branch: 'main', file: 'messages.js' };
     const EDIT_URL = `https://github.com/${REPO.owner}/${REPO.repo}/edit/${REPO.branch}/${REPO.file}`;
     const AFFILIATE_DOMAINS = ['3ha.in', 'omio.sjv.io', 'myrealt.rip'];
-    const AFFILIATE_NOTE = '※ 해당 링크로 구매 시 수수료를 지급받습니다.';
+    const AFFILIATE_NOTE = '※ 본 메시지에 포함된 링크에서 구매 발생 시 수수료를 지급받습니다.';
     // =======================================================
 
     const grid = document.getElementById('grid');
@@ -156,7 +156,7 @@
 
     function copyText(c) {
       const t = c.text.trim();
-      return c.affiliate ? t + '\n\n' + AFFILIATE_NOTE : t;
+      return c.affiliate ? AFFILIATE_NOTE + '\n\n' + t : t;
     }
 
     function showToast(msg, warn) {
@@ -262,14 +262,14 @@
 
       const prev = document.createElement('div');
       prev.className = 'preview';
-      prev.textContent = c.text.trim();
       if (c.affiliate) {
         const n = document.createElement('div');
         n.className = 'aff-note';
-        n.style.marginTop = '12px';
+        n.style.marginBottom = '12px';
         n.textContent = AFFILIATE_NOTE;
         prev.appendChild(n);
       }
+      prev.appendChild(document.createTextNode(c.text.trim()));
       card.append(head, prev);
       return card;
     }
