@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="robots" content="noindex, nofollow"/>
+  <title>외눈이 클립보드</title>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+  <style>
+    :root {
+      --bg: #0e0e12; --surface: #16161d; --border: #2a2a38;
+      --accent: #7c6cfc; --text: #e8e8f0; --muted: #7070a0;
+      --success: #4cdb8a; --gold: #f2b84b;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: var(--bg); color: var(--text);
+      font-family: 'Noto Sans KR', sans-serif; min-height: 100vh;
+      padding: 0 16px 80px;
+      background-image: radial-gradient(ellipse 60% 40% at 80% 10%, rgba(124,108,252,0.08) 0%, transparent 60%);
+      background-attachment: fixed;
+    }
+    .wrap { max-width: 680px; margin: 0 auto; }
+    header { padding: 32px 0 12px; text-align: center; }
+    header h1 {
+      font-size: 22px; font-weight: 700;
+      background: linear-gradient(135deg, #fff 30%, var(--accent) 100%);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+    }
+    header p { margin-top: 8px; color: var(--muted); font-size: 12px; }
+
+    .toolbar {
+      position: sticky; top: 0; z-index: 20;
+      background: linear-gradient(var(--bg) 82%, transparent);
+      padding: 10px 0 14px;
+    }
+    .search-row { display: flex; gap: 8px; }
+    .search {
+      flex: 1; min-width: 0; background: var(--surface); border: 1px solid var(--border);
+      color: var(--text); border-radius: 12px; padding: 12px 14px; font-size: 15px;
+      font-family: inherit; outline: none;
+    }
+    .search:focus { border-color: var(--accent); }
+    .edit-link {
+      flex-shrink: 0; display: flex; align-items: center; gap: 4px;
+      background: var(--accent); color: #fff; text-decoration: none; font-weight: 700;
+      font-size: 13px; border-radius: 12px; padding: 0 14px; white-space: nowrap;
+    }
+    .chips { display: flex; gap: 8px; margin-top: 10px; overflow-x: auto; scrollbar-width: none; }
+    .chips::-webkit-scrollbar { display: none; }
+    .chip {
+      flex-shrink: 0; background: var(--surface); border: 1px solid var(--border);
+      color: var(--muted); border-radius: 100px; padding: 6px 14px; font-size: 13px;
+      font-family: inherit; cursor: pointer;
+    }
+    .chip.on { border-color: var(--accent); color: var(--text); background: rgba(124,108,252,0.16); }
+    .count { color: var(--muted); font-size: 11px; font-family: 'DM Mono', monospace; margin: 4px 2px 0; }
+
+    .grid { display: flex; flex-direction: column; gap: 10px; margin-top: 6px; }
+    .card {
+      background: var(--surface); border: 1px solid var(--border); border-radius: 14px;
+      overflow: hidden; transition: border-color 0.15s;
+    }
+    .card:hover { border-color: var(--accent); }
+    .card.copied { border-color: rgba(76,219,138,0.5); }
+    .card.pinned { border-left: 3px solid var(--accent); }
+    .card-head { display: flex; align-items: stretch; }
+    .card-main {
+      flex: 1; min-width: 0; background: none; border: 0; color: inherit; text-align: left;
+      font-family: inherit; padding: 15px 4px 15px 16px; cursor: pointer;
+      display: flex; flex-direction: column; gap: 4px;
+    }
+    .card-title { font-size: 14px; font-weight: 500; line-height: 1.4; word-break: keep-all; }
+    .card.copied .card-title { color: var(--success); }
+    .badges { display: flex; gap: 6px; flex-wrap: wrap; }
+    .badge {
+      font-size: 10px; font-family: 'DM Mono', monospace; padding: 2px 7px; border-radius: 100px;
+      border: 1px solid var(--border); color: var(--muted);
+    }
+    .badge.aff { color: var(--gold); border-color: rgba(242,184,75,0.4); }
+    .icon-btn {
+      flex-shrink: 0; width: 44px; background: none; border: 0; color: var(--muted);
+      font-size: 17px; cursor: pointer; font-family: inherit;
+    }
+    .icon-btn:hover, .icon-btn.on { color: var(--text); }
+    .pin.on { color: var(--accent); }
+    .preview {
+      display: none; white-space: pre-wrap; word-break: break-word; font-size: 13px; line-height: 1.6;
+      color: #c8c8dc; padding: 4px 16px 16px; border-top: 1px solid var(--border);
+      padding-top: 12px; max-height: 360px; overflow: auto;
+    }
+    .card.open .preview { display: block; }
+    .preview .aff-note { color: var(--gold); }
+    .empty { text-align: center; color: var(--muted); padding: 48px 0; font-size: 14px; }
+
+    .toast {
+      position: fixed; bottom: 28px; left: 50%; transform: translateX(-50%) translateY(16px);
+      background: var(--success); color: #0a2016; font-size: 13px; font-weight: 700;
+      padding: 9px 20px; border-radius: 100px; opacity: 0; pointer-events: none;
+      transition: opacity 0.2s, transform 0.2s; z-index: 999; max-width: 92vw; text-align: center;
+    }
+    .toast.warn { background: var(--gold); color: #2a1c00; }
+    .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <h1>👁 외눈이 클립보드</h1>
+      <p>카드를 탭하면 복사 · 📌 고정 · ▾ 미리보기</p>
+    </header>
+
+    <div class="toolbar">
+      <div class="search-row">
+        <input class="search" id="search" type="search" placeholder="검색 (예: 와인바, 예약, 그라츠)" autocomplete="off" />
+        <a class="edit-link" id="editAll" href="#" target="_blank" rel="noopener">✏️ 수정하기</a>
+      </div>
+      <div class="chips" id="chips"></div>
+      <div class="count" id="count"></div>
+    </div>
+
+    <div class="grid" id="grid"></div>
+  </div>
+  <div class="toast" id="toast"></div>
+
+  <script src="messages.js"></script>
+  <script>
+    // ===== 설정 (저장소 정보가 다르면 여기만 바꾸세요) =====
+    const REPO = { owner: 'witheye1', repo: 'DMcopy', branch: 'main', file: 'messages.js' };
+    const EDIT_URL = `https://github.com/${REPO.owner}/${REPO.repo}/edit/${REPO.branch}/${REPO.file}`;
+    const AFFILIATE_DOMAINS = ['3ha.in', 'omio.sjv.io', 'myrealt.rip'];
+    const AFFILIATE_NOTE = '※ 해당 링크로 구매 시 수수료를 지급받습니다.';
+    // =======================================================
+
+    const grid = document.getElementById('grid');
+    const toast = document.getElementById('toast');
+    const searchEl = document.getElementById('search');
+    const chipsEl = document.getElementById('chips');
+    const countEl = document.getElementById('count');
+    document.getElementById('editAll').href = EDIT_URL;
+
+    const store = {
+      get(k, d) { try { return JSON.parse(localStorage.getItem(k)) ?? d; } catch (e) { return d; } },
+      set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} }
+    };
+    let pins = new Set(store.get('dm_pins', []));
+    let recent = store.get('dm_recent', []);
+    let filter = 'all';
+    let lastCopied = null;
+    let toastTimer;
+
+    const cards = MESSAGES.map((m, i) => ({
+      ...m, idx: i,
+      affiliate: AFFILIATE_DOMAINS.some(d => m.text.includes(d))
+    }));
+
+    function copyText(c) {
+      const t = c.text.trim();
+      return c.affiliate ? t + '\n\n' + AFFILIATE_NOTE : t;
+    }
+
+    function showToast(msg, warn) {
+      toast.textContent = msg;
+      toast.classList.toggle('warn', !!warn);
+      toast.classList.add('show');
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => toast.classList.remove('show'), 2200);
+    }
+
+    async function copy(text) {
+      try { await navigator.clipboard.writeText(text); return true; }
+      catch (e) {
+        try {
+          const ta = document.createElement('textarea');
+          ta.value = text; ta.style.position = 'fixed'; ta.style.opacity = '0';
+          document.body.appendChild(ta); ta.focus(); ta.select();
+          const ok = document.execCommand('copy');
+          document.body.removeChild(ta);
+          return ok;
+        } catch (e2) { return false; }
+      }
+    }
+
+    function visibleCards() {
+      const q = searchEl.value.trim().toLowerCase();
+      let list = cards.filter(c => !q || (c.title + ' ' + c.text).toLowerCase().includes(q));
+      if (filter === 'pin') list = list.filter(c => pins.has(c.title));
+      if (filter === 'aff') list = list.filter(c => c.affiliate);
+      if (filter === 'recent') {
+        list = recent.map(t => list.find(c => c.title === t)).filter(Boolean);
+      } else {
+        list = [...list.filter(c => pins.has(c.title)), ...list.filter(c => !pins.has(c.title))];
+      }
+      return list;
+    }
+
+    function render() {
+      grid.innerHTML = '';
+      const list = visibleCards();
+      countEl.textContent = `${list.length} / ${cards.length}개`;
+      if (!list.length) {
+        const e = document.createElement('div');
+        e.className = 'empty';
+        e.textContent = filter === 'pin' ? '📌 고정한 카드가 없어요' : filter === 'recent' ? '아직 복사한 카드가 없어요' : '검색 결과가 없어요';
+        grid.appendChild(e);
+        return;
+      }
+      list.forEach(c => grid.appendChild(buildCard(c)));
+    }
+
+    function buildCard(c) {
+      const card = document.createElement('div');
+      card.className = 'card' + (pins.has(c.title) ? ' pinned' : '') + (lastCopied === c.title ? ' copied' : '');
+
+      const head = document.createElement('div');
+      head.className = 'card-head';
+
+      const main = document.createElement('button');
+      main.className = 'card-main';
+      main.type = 'button';
+      const title = document.createElement('span');
+      title.className = 'card-title';
+      title.textContent = c.title;
+      main.appendChild(title);
+      if (c.affiliate) {
+        const b = document.createElement('span');
+        b.className = 'badges';
+        b.innerHTML = '<span class="badge aff">💰 제휴 문구 자동 추가</span>';
+        main.appendChild(b);
+      }
+      main.addEventListener('click', async () => {
+        const ok = await copy(copyText(c));
+        if (!ok) { showToast('복사에 실패했어요. ▾ 미리보기에서 직접 복사해 주세요', true); return; }
+        lastCopied = c.title;
+        recent = [c.title, ...recent.filter(t => t !== c.title)].slice(0, 8);
+        store.set('dm_recent', recent);
+        document.querySelectorAll('.card.copied').forEach(el => el.classList.remove('copied'));
+        card.classList.add('copied');
+        showToast('✓ 복사 완료 · ' + c.title);
+      });
+
+      const pin = mkBtn('pin icon-btn' + (pins.has(c.title) ? ' on' : ''), '📌', '고정');
+      pin.addEventListener('click', () => {
+        pins.has(c.title) ? pins.delete(c.title) : pins.add(c.title);
+        store.set('dm_pins', [...pins]);
+        render();
+      });
+
+      const open = mkBtn('icon-btn', '▾', '미리보기');
+      open.addEventListener('click', () => {
+        card.classList.toggle('open');
+        open.textContent = card.classList.contains('open') ? '▴' : '▾';
+      });
+
+      const edit = mkBtn('icon-btn', '✏️', 'GitHub에서 수정');
+      edit.addEventListener('click', () => {
+        window.open(EDIT_URL, '_blank', 'noopener');
+        showToast(`GitHub에서 Ctrl+F로 "${c.title}" 검색해 수정하세요`, true);
+      });
+
+      head.append(main, pin, open, edit);
+
+      const prev = document.createElement('div');
+      prev.className = 'preview';
+      prev.textContent = c.text.trim();
+      if (c.affiliate) {
+        const n = document.createElement('div');
+        n.className = 'aff-note';
+        n.style.marginTop = '12px';
+        n.textContent = AFFILIATE_NOTE;
+        prev.appendChild(n);
+      }
+      card.append(head, prev);
+      return card;
+    }
+
+    function mkBtn(cls, label, aria) {
+      const b = document.createElement('button');
+      b.type = 'button'; b.className = cls; b.textContent = label; b.setAttribute('aria-label', aria);
+      return b;
+    }
+
+    const CHIPS = [['all', '전체'], ['pin', '📌 고정'], ['recent', '🕘 최근'], ['aff', '💰 제휴']];
+    CHIPS.forEach(([k, label]) => {
+      const b = document.createElement('button');
+      b.type = 'button'; b.className = 'chip' + (k === filter ? ' on' : ''); b.textContent = label;
+      b.addEventListener('click', () => {
+        filter = k;
+        chipsEl.querySelectorAll('.chip').forEach(x => x.classList.remove('on'));
+        b.classList.add('on');
+        render();
+      });
+      chipsEl.appendChild(b);
+    });
+    searchEl.addEventListener('input', render);
+    render();
+  </script>
+</body>
+</html>
