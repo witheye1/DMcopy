@@ -89,13 +89,13 @@ https://maps.app.goo.gl/uzTBNa4iacUnz6X16
     text: `프렝탕 오스만 루프탑 무료 아이스링크 예약 방법이에요 ⛸️
 아래 이미지에 6단계로 정리해 뒀어요!
 
+‼️ 영상 올리자마자 매진이네요😭
+그래도 취소표 꾸준히 확인하시고, 12월 예약 오픈도
+꾸준히 들어가서 확인하고 예약하길 바랄게요! 
+
 🔗 예약 페이지
 https://www.printemps.com/fr/fr/evenements-printemps
 → 'PATINOIRE DE NOEL AVEC FROM FUTURE' 찾아서 [JE RÉSERVE = 예약하기] 클릭
-
-‼️ 예약은 순식간에 끝나요. 
-여행 전날 취소표 풀릴 수 있으니 계속 확인해보세요!
-12월 예매가 나오면 안내드릴게요. 
 
 📌 꼭 알아두세요
 ✔️ 무료, 사전 예약 필수 (30분 세션)
