@@ -108,7 +108,9 @@ https://www.printemps.com/fr/fr/evenements-printemps
 ✔️ 예약 확정 메일의 QR 코드를 현장에서 보여주세요
 
 📍 프렝탕 오스만 옥상
-64 Boulevard Haussmann, 75009 Paris`,
+Printemps Haussmann, Printemps Femme, terrasse du 7e Ciel, étage 7.
+프렝탕 오스만 여성관(Printemps Femme) 7층 옥상 테라스 ‘7e Ciel’
+프렝탕 내에서도 꼭 여성관으로 가셔야해요! `,
   },
 
   
