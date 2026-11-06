@@ -93,8 +93,13 @@ https://maps.app.goo.gl/uzTBNa4iacUnz6X16
 https://www.printemps.com/fr/fr/evenements-printemps
 → 'PATINOIRE DE NOEL AVEC FROM FUTURE' 찾아서 [JE RÉSERVE = 예약하기] 클릭
 
+‼️ 예약은 순식간에 끝나요. 
+여행 전날 취소표 풀릴 수 있으니 계속 확인해보세요!
+12월 예매가 나오면 안내드릴게요. 
+
 📌 꼭 알아두세요
 ✔️ 무료, 사전 예약 필수 (30분 세션)
+✔️ 예약페이지 기준 현재 11/7~11/29 까지 예약가능
 ✔️ 기간: 2026년 11월 7일부터 2027년 1월 3일까지
 ✔️ 월·화·목·금 위주로 열려 있고, 주말·수요일은 마감인 날이 많아요
 ✔️ 예약 화면 시간은 한국시간으로 보일 수 있어요
