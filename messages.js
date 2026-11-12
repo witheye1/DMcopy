@@ -36,7 +36,6 @@ https://paris-transport-2026.vercel.app/
   title: "스트라스부르 크리스마스 마켓 정보",
   text: `
 🎄 스트라스부르 크리스마스 마켓 정보 보내드려요!
-※ 숙로 링크에서 구매 발생 시 수수료를 지급받습니다.
 
 📅 스트라스부르 크리스마스 마켓 일정
 2026년 11월 27일 ~ 12월 24일
@@ -68,7 +67,6 @@ https://paris-transport-2026.vercel.app/
 The People Hostel - 7 Rue de la Krutenau
 대성당까지 걸어서 갈 수 있는 거리에 시설 깔끔해요!
 👉 예약: https://3ha.in/r/895447
-※ 숙로 링크에서 구매 발생 시 수수료를 지급받습니다.
 
 🗺️ 스트라스부르 여행 구글 맵 지도
 https://maps.app.goo.gl/xUdwBWH1aXwU4n9F7
